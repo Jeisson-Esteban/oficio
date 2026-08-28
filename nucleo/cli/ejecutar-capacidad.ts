@@ -8,17 +8,6 @@ import { RegistroMCP } from '../registro/registro-mcp.js';
 import { RegistroPerfiles } from '../registro/registro-perfiles.js';
 import { imprimir, leerArgumentoJSON } from './util.js';
 
-/**
- * El ejecutor genérico que las habilidades invocan: recibe SOLO
- * (perfilId, capacidadId, argumentos) -- nunca el nombre de una Herramienta.
- * Resuelve internamente qué Herramienta conectada del Perfil cumple esa
- * Capacidad y llama al Provider real.
- *
- * Los campos de credenciales requeridos por cada Herramienta se leen del
- * propio catálogo (herramientas/*.yaml, campo camposCredenciales) -- una
- * sola fuente de verdad, no una lista aparte hardcodeada aquí.
- */
-
 const [, , perfilId, capacidadId, argumentosJson] = process.argv;
 if (!perfilId || !capacidadId) {
   throw new Error('uso: ejecutar-capacidad.ts <perfilId> <capacidadId> [argumentosJson]');
