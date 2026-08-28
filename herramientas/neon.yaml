@@ -1,0 +1,18 @@
+id: neon
+nombre: Neon (Postgres)
+descripcion: >
+  Base de datos propia para guardar registros estructurados (un "CRM"
+  hecho a medida) cuando Notion o una hoja de cálculo se quedan cortos.
+categoria: registros
+capacidadesQueOfrece: [guardar_registro, consultar_registro, buscar_historial, generar_reporte, consultar_metricas]
+# No es un token clásico sino un connection string -- se guarda igual, como credencial.
+autenticacion: api_key
+integracion: registros/neon.provider.ts
+estado: disponible
+fuente: investigacion-manual
+camposCredenciales: [connectionString]
+guiaCredenciales:
+  - "Entra a https://console.neon.tech y crea un proyecto (o usa uno existente)."
+  - "En el dashboard del proyecto, copia el 'Connection string' (empieza con postgresql://...)."
+  - "Guarda ese connection string como credencial -- es lo único que hace falta."
+  - "La primera vez, correr 'npx tsx nucleo/cli/preparar-neon.ts' para crear la tabla donde se guardan los registros (seguro de repetir, no borra nada si ya existe)."

@@ -1,0 +1,9 @@
+id: google-sheets
+nombre: Google Sheets
+descripcion: Hojas de cálculo para llevar registros, reportes y análisis simples.
+categoria: registros
+capacidadesQueOfrece: [guardar_registro, consultar_registro, generar_reporte]
+autenticacion: oauth
+mcp: sheetsmcp.googleapis.com
+estado: disponible
+fuente: investigacion-manual

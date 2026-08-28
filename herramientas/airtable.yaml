@@ -1,0 +1,9 @@
+id: airtable
+nombre: Airtable
+descripcion: Bases de datos tipo hoja de cálculo, útiles para llevar registros estructurados y flujos de trabajo simples.
+categoria: registros
+capacidadesQueOfrece: [guardar_registro, consultar_registro]
+autenticacion: oauth
+mcp: mcp.airtable.com
+estado: disponible
+fuente: investigacion-manual

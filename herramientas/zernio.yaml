@@ -1,0 +1,17 @@
+id: zernio
+nombre: Zernio
+descripcion: >
+  API unificada de redes sociales y mensajería (rebrand de "Late"/getlate.dev):
+  publicar, programar y medir en 16+ redes sociales y canales de mensajería.
+categoria: social-media
+capacidadesQueOfrece: [publicar_contenido, consultar_metricas, generar_reporte]
+autenticacion: api_key
+mcp: zernio
+integracion: social-media/zernio.provider.ts
+estado: disponible
+fuente: investigacion-manual
+camposCredenciales: [token]
+guiaCredenciales:
+  - "Entra a tu cuenta de Zernio (zernio.com) -> Settings -> API Keys."
+  - "Crea una API key nueva (dale un nombre para reconocerla)."
+  - "Copia esa clave -- es lo único que hace falta."

@@ -1,0 +1,18 @@
+id: metricool
+nombre: Metricool
+descripcion: >
+  Gestión y analítica de redes sociales -- publicar, programar y medir
+  resultados. Su conexión corre como un proceso local en tu computadora
+  (no un servicio en la nube), así que necesita tener Python/uv instalado.
+categoria: social-media
+capacidadesQueOfrece: [publicar_contenido, consultar_metricas, generar_reporte]
+autenticacion: api_key
+mcp: metricool
+integracion: social-media/metricool.provider.ts
+estado: disponible
+fuente: investigacion-manual
+camposCredenciales: [userToken, userId, blogId]
+guiaCredenciales:
+  - "Si no tienes 'uv' instalado (el ejecutor de Python que usa esta conexión), instálalo desde https://docs.astral.sh/uv/getting-started/installation/ -- es un instalador de un solo paso."
+  - "Entra a tu cuenta de Metricool -> Settings -> tu perfil, y copia tu 'User Token' y tu 'User Id'."
+  - "El 'Blog Id' identifica cuál de tus marcas/perfiles en Metricool se usa -- si tienes solo una, pregúntame y te ayudo a encontrarlo la primera vez que conectemos."

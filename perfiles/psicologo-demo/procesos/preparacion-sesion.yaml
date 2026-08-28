@@ -1,0 +1,23 @@
+id: preparacion-sesion
+nombre: Preparación de sesión
+descripcion: Antes de cada sesión, revisa las notas anteriores del paciente y
+  prepara un resumen de pendientes.
+disparador:
+  tipo: manual
+pasos:
+  - descripcion: Identificar al paciente de la próxima cita
+    capacidad: consultar_agenda
+  - descripcion: Buscar las últimas 3 sesiones del paciente
+    capacidad: buscar_historial
+  - descripcion: Identificar puntos pendientes
+reglas:
+  - texto: Si el paciente es nuevo, avisar que es su primera sesión en vez de buscar
+      historial.
+capacidadesUsadas:
+  - consultar_agenda
+  - buscar_historial
+estado: activo
+version: 1
+creadoEn: 2026-08-15T00:00:00.000Z
+actualizadoEn: 2026-08-15T00:00:00.000Z
+historial: []

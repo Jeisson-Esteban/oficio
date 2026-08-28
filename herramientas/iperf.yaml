@@ -1,0 +1,10 @@
+id: iperf
+nombre: iPerf / iPerf3 (hipótesis, no confirmado)
+descripcion: >
+  Hipótesis de mejor esfuerzo para el término "Iperframes"/"Hiperframe" que
+  mencionó el usuario -- herramienta de medición de ancho de banda de red.
+  Confianza MEDIA/BAJA, no confirmado por el usuario todavía.
+categoria: networking
+capacidadesQueOfrece: []
+estado: no_confirmado
+fuente: investigacion-manual

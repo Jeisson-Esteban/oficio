@@ -1,0 +1,11 @@
+id: holded
+nombre: Holded
+descripcion: ERP/facturación español -- facturas, contactos, proyectos.
+categoria: finanzas
+capacidadesQueOfrece: [guardar_registro, consultar_registro, generar_reporte]
+autenticacion: oauth
+mcp: holded.com/developers/mcp
+# MCP oficial existe pero con adopción/tracción aún baja en la investigación --
+# queda pendiente de evaluar antes de ofrecerla como "disponible" para conectar.
+estado: pendiente_evaluacion
+fuente: investigacion-manual

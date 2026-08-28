@@ -1,0 +1,18 @@
+id: mailerlite
+nombre: MailerLite
+descripcion: >
+  Email marketing -- suscriptores, campañas, automatizaciones. Su MCP
+  todavía está en beta, así que puede que algún detalle necesite ajustarse
+  la primera vez que se conecte de verdad.
+categoria: email-marketing
+capacidadesQueOfrece: [guardar_registro, consultar_registro, consultar_metricas, generar_reporte]
+autenticacion: api_key
+mcp: mailerlite
+integracion: email-marketing/mailerlite.provider.ts
+estado: disponible
+fuente: investigacion-manual
+camposCredenciales: [token]
+guiaCredenciales:
+  - "Entra a tu cuenta de MailerLite -> Integrations -> API."
+  - "Genera un nuevo token de API (dale un nombre para reconocerlo, ej. el nombre de tu proyecto)."
+  - "Copia ese token -- es lo único que hace falta."

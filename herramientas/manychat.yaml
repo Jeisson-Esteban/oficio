@@ -1,0 +1,12 @@
+id: manychat
+nombre: ManyChat
+descripcion: >
+  Chatbots y mensajería directa (Instagram, WhatsApp, Messenger) -- no es
+  para publicar contenido en redes, sino para automatizar conversaciones
+  con clientes/leads.
+categoria: social-media
+capacidadesQueOfrece: []
+# Sin MCP oficial confirmado (solo wrappers de terceros no verificados) --
+# no se ofrece como conectable todavía, ver skill conectar-herramienta.
+estado: pendiente_evaluacion
+fuente: investigacion-manual

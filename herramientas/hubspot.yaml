@@ -1,0 +1,9 @@
+id: hubspot
+nombre: HubSpot
+descripcion: CRM con gestión de clientes, oportunidades y automatización de marketing.
+categoria: crm-marketing
+capacidadesQueOfrece: [guardar_registro, consultar_registro, generar_reporte, consultar_metricas]
+autenticacion: oauth
+mcp: mcp.hubspot.com
+estado: disponible
+fuente: investigacion-manual

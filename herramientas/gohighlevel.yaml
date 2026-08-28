@@ -1,0 +1,19 @@
+id: gohighlevel
+nombre: GoHighLevel
+descripcion: >
+  Plataforma de CRM y marketing todo-en-uno: contactos, oportunidades,
+  conversaciones, facturación y campañas.
+categoria: email-marketing
+capacidadesQueOfrece: [guardar_registro, consultar_registro, generar_reporte, consultar_metricas]
+autenticacion: api_key
+integracion: email-marketing/gohighlevel.provider.ts
+estado: disponible
+fuente: investigacion-manual
+# A diferencia de MailerLite/Klaviyo, el MCP de GoHighLevel es por subcuenta:
+# no tiene una URL fija, por eso "mcpUrl" es parte de las credenciales en vez
+# de vivir en mcp-registry.config.yaml.
+camposCredenciales: [mcpUrl, token]
+guiaCredenciales:
+  - "Entra a tu cuenta de GoHighLevel -> Settings -> Private Integrations (o Marketplace, según la versión)."
+  - "Crea una 'Private Integration Token' nueva, dale los permisos de contactos y oportunidades, y cópiala."
+  - "En la documentación de GoHighLevel de tu subcuenta, busca la URL de tu MCP (tiene la forma services.leadconnectorhq.com/mcp/tu-id-de-subcuenta/v2) y cópiala completa."

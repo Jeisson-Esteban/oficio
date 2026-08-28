@@ -1,0 +1,25 @@
+id: google-calendar
+nombre: Google Calendar
+descripcion: >
+  Gestión de citas y reuniones. Permite consultar disponibilidad, crear
+  eventos y enviar recordatorios.
+categoria: agenda
+capacidadesQueOfrece: [consultar_agenda, consultar_disponibilidad, crear_cita, enviar_recordatorio]
+autenticacion: service_account
+estado: disponible
+fuente: investigacion-manual
+# Nota: ya existe en el entorno de Claude Code del usuario una skill "gws-ops"
+# con Calendar (lectura) vía Service Account/Domain-Wide Delegation. La Fase 3
+# evalúa envolverla en vez de duplicar el acceso, y confirma si cubre también
+# escritura (crear_cita) o si hay que extenderla.
+integracion: agenda/google-calendar.provider.ts
+camposCredenciales: [clientEmail, privateKey, calendarId, subject]
+guiaCredenciales:
+  - "Entra a https://console.cloud.google.com y crea (o elige) un proyecto."
+  - "Ve a 'APIs y servicios' -> 'Biblioteca', busca 'Google Calendar API' y actívala para ese proyecto."
+  - "Ve a 'APIs y servicios' -> 'Credenciales' -> 'Crear credenciales' -> 'Cuenta de servicio'. Dale un nombre y créala."
+  - "Entra a la cuenta de servicio recién creada -> pestaña 'Claves' -> 'Agregar clave' -> 'Crear clave nueva' -> tipo JSON. Se descarga un archivo."
+  - "Abre ese archivo JSON: ahí están 'client_email' y 'private_key', los dos valores que hacen falta."
+  - "En Google Calendar, comparte el calendario que quieres usar con ese 'client_email' (Configuración del calendario -> 'Compartir con determinadas personas' -> pegar el client_email -> dar permiso de 'Hacer cambios en los eventos')."
+  - "El id del calendario está en esa misma pantalla de configuración, en 'Integrar calendario' (para el calendario principal de una cuenta normal, suele ser simplemente su email; para uno compartido de un Workspace, es un id largo terminado en @group.calendar.google.com)."
+  - "El campo 'subject' solo hace falta si la cuenta de servicio actúa 'a nombre de' otra persona (Domain-Wide Delegation, típico en Google Workspace de empresa) -- si no es tu caso, se puede dejar vacío."

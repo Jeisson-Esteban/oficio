@@ -1,0 +1,139 @@
+# Catálogo de Capacidades: lo que el sistema puede hacer, sin decir con qué
+# Herramienta. Cada Proceso de cada Perfil solo referencia ids de aquí.
+#
+# resolucion:
+#   integracion    -> lo cumple un Provider técnico (integraciones/) sobre un MCP/API
+#   logica_negocio -> lo cumple código propio determinista (logica_negocio/)
+#   razonamiento   -> lo resuelve Claude directamente, sin llamar a nada externo
+#
+# sensible: true exige confirmación explícita antes de ejecutar/automatizar (ver permisos/).
+
+capacidades:
+  # --- registros (fichas, notas, proyectos, clientes...) ---
+  - id: guardar_registro
+    nombre: Guardar registro
+    descripcion: >
+      Guarda un registro estructurado (paciente, cliente, proyecto...) en la
+      herramienta donde el profesional lleva esa información.
+    categoria: registros
+    entrada: [tipo_registro, datos]
+    salida: confirmacion
+    resolucion: integracion
+    interfazProvider: registros.RecordProvider
+    metodo: guardar
+    sensible: true
+
+  - id: consultar_registro
+    nombre: Consultar registro
+    descripcion: Busca y devuelve un registro existente por identificador o criterio de búsqueda.
+    categoria: registros
+    entrada: [tipo_registro, criterio]
+    salida: registro
+    resolucion: integracion
+    interfazProvider: registros.RecordProvider
+    metodo: consultar
+    sensible: true
+
+  - id: buscar_historial
+    nombre: Buscar historial
+    descripcion: Recupera las entradas anteriores relacionadas a un registro (ej. últimas sesiones de un paciente).
+    categoria: registros
+    entrada: [tipo_registro, referencia, cantidad]
+    salida: lista_entradas
+    resolucion: integracion
+    interfazProvider: registros.RecordProvider
+    metodo: buscarHistorial
+    sensible: true
+
+  # --- agenda ---
+  - id: consultar_agenda
+    nombre: Consultar agenda
+    descripcion: Consulta las próximas citas o eventos del profesional.
+    categoria: agenda
+    entrada: [rango_fechas]
+    salida: lista_eventos
+    resolucion: integracion
+    interfazProvider: agenda.CalendarProvider
+    metodo: consultarProximos
+
+  - id: consultar_disponibilidad
+    nombre: Consultar disponibilidad
+    descripcion: Revisa huecos libres en el calendario del profesional para ofrecer horarios.
+    categoria: agenda
+    entrada: [rango_fechas, duracion]
+    salida: lista_horarios
+    resolucion: integracion
+    interfazProvider: agenda.CalendarProvider
+    metodo: consultarDisponibilidad
+
+  - id: crear_cita
+    nombre: Crear cita
+    descripcion: Agenda una nueva cita o reunión en el calendario del profesional.
+    categoria: agenda
+    entrada: [titulo, fecha_hora, duracion, participante]
+    salida: confirmacion_cita
+    resolucion: integracion
+    interfazProvider: agenda.CalendarProvider
+    metodo: crearEvento
+
+  - id: enviar_recordatorio
+    nombre: Enviar recordatorio
+    descripcion: Agrega un recordatorio (email o notificación) a una cita ya agendada, para que el profesional no se la pierda.
+    categoria: agenda
+    entrada: [evento_id, minutos_antes, metodo]
+    salida: confirmacion
+    resolucion: integracion
+    interfazProvider: agenda.CalendarProvider
+    metodo: agregarRecordatorio
+
+  # --- razonamiento puro (no llama a nada externo) ---
+  - id: identificar_pendientes
+    nombre: Identificar pendientes
+    descripcion: Analiza notas o registros y extrae los puntos importantes o pendientes.
+    categoria: analisis
+    entrada: [texto_o_registros]
+    salida: resumen_pendientes
+    resolucion: razonamiento
+
+  - id: generar_resumen
+    nombre: Generar resumen
+    descripcion: Sintetiza información dispersa en un resumen breve y accionable para el profesional.
+    categoria: analisis
+    entrada: [informacion]
+    salida: resumen
+    resolucion: razonamiento
+
+  # --- reporting / marketing ---
+  - id: generar_reporte
+    nombre: Generar reporte
+    descripcion: Genera un reporte (financiero, de campañas, de proyecto...) a partir de datos de una Herramienta conectada.
+    categoria: reporting
+    entrada: [tipo_reporte, periodo]
+    salida: reporte
+    resolucion: integracion
+    interfazProvider: reporting.ReportingProvider
+    metodo: generar
+
+  - id: consultar_metricas
+    nombre: Consultar métricas
+    descripcion: Consulta métricas de desempeño (campañas, ventas, redes sociales...) de una Herramienta conectada.
+    categoria: reporting
+    entrada: [tipo_metrica, periodo]
+    salida: metricas
+    resolucion: integracion
+    interfazProvider: reporting.ReportingProvider
+    metodo: consultarMetricas
+
+  # --- redes sociales ---
+  - id: publicar_contenido
+    nombre: Publicar contenido
+    descripcion: >
+      Publica un contenido (texto, imagen o video) en una o varias redes
+      sociales conectadas de una sola vez -- por ejemplo, cuando el
+      profesional manda un video al chat y pide subirlo a todas sus redes.
+    categoria: social-media
+    entrada: [texto, url_media, redes, fecha_programada]
+    salida: confirmacion_publicacion
+    resolucion: integracion
+    interfazProvider: social-media.SocialMediaProvider
+    metodo: publicar

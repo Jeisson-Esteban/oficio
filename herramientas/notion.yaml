@@ -1,0 +1,22 @@
+id: notion
+nombre: Notion
+descripcion: >
+  Espacio de trabajo para notas, bases de datos y documentos. Útil para
+  fichas de pacientes/clientes, proyectos o cualquier registro estructurado.
+categoria: registros
+capacidadesQueOfrece: [guardar_registro, consultar_registro, buscar_historial]
+# El Provider usa el "Internal Integration Secret" de Notion (un token fijo),
+# no un flujo OAuth completo -- de ahí api_key en vez de oauth.
+autenticacion: api_key
+mcp: nativo-claude-code
+estado: disponible
+fuente: investigacion-manual
+camposCredenciales: [token, databaseId]
+guiaCredenciales:
+  - "Entra a https://www.notion.so/my-integrations con tu cuenta de Notion."
+  - "Haz clic en 'New integration', ponle un nombre (ej. el nombre de tu consultorio) y guárdala."
+  - "En la página de la integración recién creada, copia el 'Internal Integration Secret' (empieza con 'ntn_' o 'secret_')."
+  - "Abre en Notion la base de datos donde vas a guardar tus registros (fichas, clientes, proyectos...)."
+  - "En esa base de datos, arriba a la derecha, abre el menú '···' -> 'Connections' -> conecta la integración que acabas de crear."
+  - "Copia el id de esa base de datos: es el trozo de 32 caracteres en su URL, justo después de notion.so/ y antes del '?'."
+  - "Con esos dos valores (el secreto y el id), ya se pueden guardar como variables de entorno."

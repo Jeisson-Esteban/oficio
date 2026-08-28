@@ -1,0 +1,29 @@
+# Catálogo de MCPs EXTERNOS con endpoint fijo. GoHighLevel no está aquí
+# porque su endpoint es por subcuenta (ver integraciones/email-marketing/gohighlevel.provider.ts) --
+# su URL vive en las credenciales, no en este archivo. Notion y Google
+# Calendar tampoco están aquí porque sus Providers usan REST directo, no
+# este registro (ver nucleo/registro/registro-mcp.ts para el porqué).
+
+mcps:
+  - id: mailerlite
+    url: https://mcp.mailerlite.com/mcp
+    requiereAuth: true
+
+  - id: klaviyo
+    url: https://mcp.klaviyo.com/mcp
+    requiereAuth: true
+
+  # Endpoint verificado contra la documentación oficial de Zernio (no adivinado).
+  - id: zernio
+    url: https://mcp.zernio.com/mcp
+    requiereAuth: true
+
+  # Metricool NO tiene endpoint hosteado -- corre local via `uvx`, confirmado
+  # contra help.metricool.com. Requiere tener `uv` instalado (uvx viene con él).
+  - id: metricool
+    comando: uvx
+    argumentos: ['--upgrade', 'mcp-metricool']
+    requiereAuth: true
+    variablesEntorno:
+      userToken: METRICOOL_USER_TOKEN
+      userId: METRICOOL_USER_ID

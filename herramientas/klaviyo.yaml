@@ -1,0 +1,15 @@
+id: klaviyo
+nombre: Klaviyo
+descripcion: Email marketing y automatización, especialmente fuerte en e-commerce.
+categoria: email-marketing
+capacidadesQueOfrece: [guardar_registro, consultar_registro, consultar_metricas, generar_reporte]
+autenticacion: api_key
+mcp: klaviyo
+integracion: email-marketing/klaviyo.provider.ts
+estado: disponible
+fuente: investigacion-manual
+camposCredenciales: [token]
+guiaCredenciales:
+  - "Entra a tu cuenta de Klaviyo -> Settings -> API Keys."
+  - "Crea una 'Private API Key' nueva (dale un nombre para reconocerla)."
+  - "Copia esa clave -- es lo único que hace falta."

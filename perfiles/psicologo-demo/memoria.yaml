@@ -1,0 +1,5 @@
+entradas:
+  - tipo: dato_negocio
+    clave: horario_atencion
+    valor: Atiende de lunes a viernes, de 9 a 5.
+    creadoEn: 2026-08-28T00:00:00.000Z

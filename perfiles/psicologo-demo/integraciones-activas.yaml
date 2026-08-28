@@ -1,0 +1,23 @@
+integraciones:
+  - herramienta: notion
+    capacidadesHabilitadas:
+      - guardar_registro
+      - consultar_registro
+      - buscar_historial
+    credencialesRef: NOTION__DEFAULT__TOKEN
+    conectadoEn: 2026-08-15T00:00:00.000Z
+    estado: activa
+  - herramienta: google-calendar
+    capacidadesHabilitadas:
+      - consultar_agenda
+    credencialesRef: GOOGLE_CALENDAR__DEFAULT__CLIENT_EMAIL
+    conectadoEn: 2026-08-15T00:00:00.000Z
+    estado: activa
+    verificacion:
+      ok: false
+      en: 2026-08-20T16:43:38.247Z
+      error: 'Faltan variables de entorno para "google-calendar":
+        GOOGLE_CALENDAR__DEFAULT__CLIENT_EMAIL,
+        GOOGLE_CALENDAR__DEFAULT__PRIVATE_KEY,
+        GOOGLE_CALENDAR__DEFAULT__CALENDAR_ID,
+        GOOGLE_CALENDAR__DEFAULT__SUBJECT'

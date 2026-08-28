@@ -1,0 +1,32 @@
+# dependencias e build
+node_modules/
+dist/
+
+# credenciales -- nunca se commitean
+.env
+.env.local
+.env.*.local
+
+# config local de agentes de IA (personal/de esta maquina, no del producto)
+.claude/settings.local.json
+.mcp.json
+.codex/hooks.json
+.impeccable/
+
+# skills de terceros instaladas via npx/CLI -- reinstalables, no son parte del producto.
+# Ver README para como reinstalarlas (npx skills add / npx impeccable install / npx ui-ux-pro-max-cli init).
+.agents/skills/find-skills/
+.agents/skills/impeccable/
+.claude/skills/
+
+# lockfile de instalador de skills de terceros
+skills-lock.json
+
+# datos generados en runtime (logs de actividad, reportes de patrones) --
+# se regeneran solos, no hace falta versionarlos salvo que se quiera un
+# ejemplo de referencia a proposito
+perfiles/*/actividad.jsonl
+perfiles/*/patrones/
+
+logs/
+*.log
