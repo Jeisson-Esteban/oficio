@@ -35,25 +35,43 @@ function estadoDeHerramienta(id) {
   return integracionesDelPerfil.find((i) => i.herramienta === id && i.estado === 'activa');
 }
 
+const SVG_LAPIZ = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <path d="M4 20h4l10.5-10.5a2 2 0 0 0 0-2.83l-1.17-1.17a2 2 0 0 0-2.83 0L4 16v4z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
 function renderizarTarjeta(h) {
   const integracion = estadoDeHerramienta(h.id);
-  let badge = '';
+  const disponible = h.estado === 'disponible';
+
+  // Un punto de color es más rápido de escanear que leer texto (como en n8n),
+  // pero el texto se mantiene siempre debajo -- el color nunca es la única señal.
+  let claseEstado = 'sin-conectar';
+  let textoEstado = 'Sin conectar';
   if (integracion) {
-    if (integracion.verificacion?.ok) badge = '<div class="estado-badge ok">Conectada y verificada</div>';
-    else if (integracion.verificacion) badge = '<div class="estado-badge error">Conectada, sin verificar bien</div>';
-    else badge = '<div class="estado-badge">Conectada (sin verificar todavía)</div>';
+    if (integracion.verificacion?.ok) {
+      claseEstado = 'ok';
+      textoEstado = 'Conectada y verificada';
+    } else if (integracion.verificacion) {
+      claseEstado = 'error';
+      textoEstado = 'Conectada, sin verificar bien';
+    } else {
+      claseEstado = 'pendiente';
+      textoEstado = 'Conectada (sin verificar todavía)';
+    }
   }
 
   const chips = h.capacidadesQueOfrece.map((c) => `<span class="chip">${c}</span>`).join('');
-  const disponible = h.estado === 'disponible';
 
   return `
     <div class="tarjeta">
-      <h3>${h.nombre}</h3>
+      <div class="tarjeta-header">
+        ${disponible ? `<span class="punto-estado ${claseEstado}" title="${textoEstado}"></span>` : ''}
+        <h3>${h.nombre}</h3>
+        ${disponible ? `<button data-id="${h.id}" class="btn-editar" type="button" aria-label="${integracion ? 'Editar conexión' : 'Conectar'} de ${h.nombre}" title="${integracion ? 'Editar conexión' : 'Conectar'}">${SVG_LAPIZ}</button>` : ''}
+      </div>
       <p>${h.descripcion}</p>
       <div class="capacidades">${chips}</div>
-      ${badge}
-      ${disponible ? `<button data-id="${h.id}" class="btn-conectar">${integracion ? 'Reconectar' : 'Conectar'}</button>` : `<span class="estado-badge">${h.estado.replace('_', ' ')}</span>`}
+      ${disponible ? `<div class="estado-badge ${claseEstado}">${textoEstado}</div>` : `<span class="estado-badge">${h.estado.replace('_', ' ')}</span>`}
     </div>
   `;
 }
@@ -64,7 +82,7 @@ async function renderizarTodo() {
   const pendientes = herramientas.filter((h) => h.estado !== 'disponible');
   listaDisponibles.innerHTML = disponibles.map(renderizarTarjeta).join('');
   listaPendientes.innerHTML = pendientes.map(renderizarTarjeta).join('');
-  document.querySelectorAll('.btn-conectar').forEach((btn) => {
+  document.querySelectorAll('.btn-editar').forEach((btn) => {
     btn.addEventListener('click', () => abrirModal(btn.dataset.id));
   });
 }

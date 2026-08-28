@@ -1,0 +1,22 @@
+id: outlook-calendar
+nombre: Outlook Calendar (Microsoft 365)
+descripcion: >
+  Gestión de citas y reuniones en Microsoft 365 / Outlook. En organizaciones
+  con Microsoft 365 gestionado (empresas, universidades), este paso lo
+  suele tener que hacer -o autorizar- alguien del área de sistemas/TI, no
+  necesariamente tú.
+categoria: agenda
+capacidadesQueOfrece: [consultar_agenda, consultar_disponibilidad, crear_cita, enviar_recordatorio]
+autenticacion: oauth
+integracion: agenda/outlook-calendar.provider.ts
+estado: disponible
+fuente: investigacion-manual
+camposCredenciales: [tenantId, clientId, clientSecret, userId]
+guiaCredenciales:
+  - "Este paso requiere permisos de Administrador en el Microsoft 365 de tu organización -- si no eres tú, pídeselo al área de sistemas/TI y comparte con ellos esta misma guía."
+  - "Entra a https://portal.azure.com -> busca 'Azure Active Directory' -> 'App registrations' -> 'New registration'. Dale un nombre (ej. el de tu proyecto) y regístrala."
+  - "En la página de la aplicación recién creada, copia el 'Application (client) ID' y el 'Directory (tenant) ID'."
+  - "Ve a 'Certificates & secrets' -> 'New client secret'. Créalo y copia el VALOR del secreto de inmediato -- no se vuelve a mostrar después."
+  - "Ve a 'API permissions' -> 'Add a permission' -> 'Microsoft Graph' -> 'Application permissions' -> busca y marca 'Calendars.ReadWrite'."
+  - "Haz clic en 'Grant admin consent' -- este es el paso que puede necesitar aprobación de un administrador de tu organización."
+  - "El 'userId' es el correo de la persona cuyo calendario se va a usar (ej. tu-correo@tu-universidad.edu)."

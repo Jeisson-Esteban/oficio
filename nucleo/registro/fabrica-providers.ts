@@ -1,5 +1,7 @@
 import { ClienteTokenServiceAccount } from '../../integraciones/agenda/cliente-token-google.js';
+import { ClienteTokenMicrosoft } from '../../integraciones/agenda/cliente-token-microsoft.js';
 import { GoogleCalendarProvider } from '../../integraciones/agenda/google-calendar.provider.js';
+import { OutlookCalendarProvider } from '../../integraciones/agenda/outlook-calendar.provider.js';
 import { GoHighLevelProvider } from '../../integraciones/email-marketing/gohighlevel.provider.js';
 import { KlaviyoProvider } from '../../integraciones/email-marketing/klaviyo.provider.js';
 import { MailerLiteProvider } from '../../integraciones/email-marketing/mailerlite.provider.js';
@@ -87,6 +89,27 @@ export async function construirProvider(
       subject: c.subject,
     });
     const provider = new GoogleCalendarProvider({ clienteToken, calendarId: c.calendarId! });
+    return {
+      provider,
+      verificarSalud: () =>
+        comoSalud(() => {
+          const ahora = new Date();
+          return provider.consultarProximos({
+            desde: ahora.toISOString(),
+            hasta: new Date(ahora.getTime() + 60_000).toISOString(),
+          });
+        }),
+    };
+  }
+
+  if (herramientaId === 'outlook-calendar') {
+    const c = await almacenCredenciales.obtenerCredencial({ proveedor: 'outlook-calendar' });
+    const clienteToken = new ClienteTokenMicrosoft({
+      tenantId: c.tenantId!,
+      clientId: c.clientId!,
+      clientSecret: c.clientSecret!,
+    });
+    const provider = new OutlookCalendarProvider({ clienteToken, userId: c.userId! });
     return {
       provider,
       verificarSalud: () =>

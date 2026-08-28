@@ -12,6 +12,8 @@ dist/
 .mcp.json
 .codex/hooks.json
 .impeccable/
+# artefacto que genera solo el hook "Stop" de impeccable en su pasada profunda
+*.local.html
 
 # skills de terceros instaladas via npx/CLI -- reinstalables, no son parte del producto.
 # Ver README para como reinstalarlas (npx skills add / npx impeccable install / npx ui-ux-pro-max-cli init).
