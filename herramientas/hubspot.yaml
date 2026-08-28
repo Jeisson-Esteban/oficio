@@ -7,3 +7,4 @@ autenticacion: oauth
 mcp: mcp.hubspot.com
 estado: disponible
 fuente: investigacion-manual
+icono: hubspot.svg

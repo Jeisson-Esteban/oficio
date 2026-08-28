@@ -43,6 +43,12 @@ export const HerramientaSchema = z.object({
    * configure nada -- nunca se improvisan en la conversación.
    */
   guiaCredenciales: z.array(z.string()).default([]),
+  /**
+   * Nombre de archivo bajo nucleo/web/publico/iconos/ (ej. "notion.svg"), si
+   * hay un logo real disponible. Si falta, la interfaz muestra un monograma
+   * generado -- no todas las marcas tienen ícono libre disponible todavía.
+   */
+  icono: z.string().optional(),
 });
 
 export type Herramienta = z.infer<typeof HerramientaSchema>;

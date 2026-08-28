@@ -101,3 +101,21 @@ describe('GET /', () => {
     expect(html).not.toContain('%%TOKEN_INTERFAZ%%');
   });
 });
+
+describe('GET /iconos/*', () => {
+  it('sirve un ícono real del catálogo', async () => {
+    const respuesta = await fetch(`${baseUrl}/iconos/notion.svg`);
+    expect(respuesta.status).toBe(200);
+    expect(respuesta.headers.get('content-type')).toContain('image/svg+xml');
+  });
+
+  it('rechaza un nombre con path traversal en vez de servir un archivo fuera de iconos/', async () => {
+    const respuesta = await fetch(`${baseUrl}/iconos/${encodeURIComponent('../package.json')}`);
+    expect(respuesta.status).toBe(404);
+  });
+
+  it('devuelve 404 (no un error) para una herramienta sin ícono en el catálogo', async () => {
+    const respuesta = await fetch(`${baseUrl}/iconos/gohighlevel.svg`);
+    expect(respuesta.status).toBe(404);
+  });
+});

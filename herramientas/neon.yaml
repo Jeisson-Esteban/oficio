@@ -16,3 +16,4 @@ guiaCredenciales:
   - "En el dashboard del proyecto, copia el 'Connection string' (empieza con postgresql://...)."
   - "Guarda ese connection string como credencial -- es lo único que hace falta."
   - "La primera vez, correr 'npx tsx nucleo/cli/preparar-neon.ts' para crear la tabla donde se guardan los registros (seguro de repetir, no borra nada si ya existe)."
+icono: neon.svg

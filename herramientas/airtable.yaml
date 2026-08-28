@@ -7,3 +7,4 @@ autenticacion: oauth
 mcp: mcp.airtable.com
 estado: disponible
 fuente: investigacion-manual
+icono: airtable.svg

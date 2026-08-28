@@ -39,6 +39,24 @@ const SVG_LAPIZ = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" a
   <path d="M4 20h4l10.5-10.5a2 2 0 0 0 0-2.83l-1.17-1.17a2 2 0 0 0-2.83 0L4 16v4z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 
+// Color determinístico a partir del id -- mismo id, siempre mismo color,
+// sin tener que mantener una lista de colores a mano.
+function colorParaId(id) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+  return `hsl(${hash % 360}, 55%, 42%)`;
+}
+
+// Logo real si el catálogo trae uno (herramientas/<id>.yaml -> icono); si no,
+// un monograma con la inicial -- nunca un ícono roto ni un genérico gris.
+function iconoDe(h) {
+  if (h.icono) {
+    return `<img class="icono-herramienta" src="/iconos/${h.icono}" alt="" width="22" height="22" />`;
+  }
+  const inicial = (h.nombre.trim().charAt(0) || '?').toUpperCase();
+  return `<span class="icono-herramienta icono-monograma" style="background:${colorParaId(h.id)}" aria-hidden="true">${inicial}</span>`;
+}
+
 function renderizarTarjeta(h) {
   const integracion = estadoDeHerramienta(h.id);
   const disponible = h.estado === 'disponible';
@@ -65,6 +83,7 @@ function renderizarTarjeta(h) {
   return `
     <div class="tarjeta">
       <div class="tarjeta-header">
+        ${iconoDe(h)}
         ${disponible ? `<span class="punto-estado ${claseEstado}" title="${textoEstado}"></span>` : ''}
         <h3>${h.nombre}</h3>
         ${disponible ? `<button data-id="${h.id}" class="btn-editar" type="button" aria-label="${integracion ? 'Editar conexión' : 'Conectar'} de ${h.nombre}" title="${integracion ? 'Editar conexión' : 'Conectar'}">${SVG_LAPIZ}</button>` : ''}

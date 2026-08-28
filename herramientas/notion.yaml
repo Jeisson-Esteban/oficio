@@ -11,6 +11,7 @@ autenticacion: api_key
 mcp: nativo-claude-code
 estado: disponible
 fuente: investigacion-manual
+icono: notion.svg
 camposCredenciales: [token, databaseId]
 guiaCredenciales:
   - "Entra a https://www.notion.so/my-integrations con tu cuenta de Notion."

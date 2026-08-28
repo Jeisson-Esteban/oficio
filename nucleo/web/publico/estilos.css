@@ -123,6 +123,18 @@ section { margin-bottom: 2rem; }
 }
 
 .tarjeta-header { display: flex; align-items: center; gap: 0.5rem; }
+
+.icono-herramienta { flex-shrink: 0; border-radius: 6px; }
+.icono-monograma {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
 .tarjeta h3 { margin: 0; font-size: 1rem; font-weight: 700; flex: 1; }
 .tarjeta p { color: var(--color-muted-foreground); font-size: 0.85rem; margin: 0; }
 

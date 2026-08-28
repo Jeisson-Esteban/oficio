@@ -39,7 +39,13 @@ const TIPOS_MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
+  '.svg': 'image/svg+xml',
 };
+
+// mismo espíritu que assertIdSeguro (nucleo/registro/validar-id.ts): un
+// nombre de ícono viene del catálogo, pero igual se valida antes de
+// convertirlo en ruta de archivo -- barato y evita cualquier sorpresa.
+const NOMBRE_ICONO_SEGURO = /^[a-z0-9-]+\.svg$/;
 
 const ConectarRequestSchema = z.object({
   perfilId: z.string().regex(/^[a-z][a-z0-9-]*$/, 'perfilId debe ser kebab-case'),
@@ -192,6 +198,15 @@ export function crearServidor(): http.Server {
     if (req.method === 'GET' && url.pathname === '/') return await servirIndexConToken(res);
     if (req.method === 'GET' && (url.pathname === '/app.js' || url.pathname === '/estilos.css')) {
       return await servirArchivoEstatico(res, url.pathname.slice(1));
+    }
+
+    if (req.method === 'GET' && url.pathname.startsWith('/iconos/')) {
+      const nombre = url.pathname.slice('/iconos/'.length);
+      if (!NOMBRE_ICONO_SEGURO.test(nombre)) {
+        res.writeHead(404);
+        return res.end('No encontrado');
+      }
+      return await servirArchivoEstatico(res, `iconos/${nombre}`);
     }
 
     if (req.method === 'GET' && url.pathname === '/api/herramientas') {

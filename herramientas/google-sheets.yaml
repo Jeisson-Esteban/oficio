@@ -7,3 +7,4 @@ autenticacion: oauth
 mcp: sheetsmcp.googleapis.com
 estado: disponible
 fuente: investigacion-manual
+icono: googlesheets.svg
