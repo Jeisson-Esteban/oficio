@@ -1,7 +1,9 @@
+import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { z } from 'zod';
 import { PerfilSchema } from '../contratos/perfil.js';
 import { claveEntorno } from '../configuracion/variables-entorno.js';
 import { establecerVariablesEnv } from '../configuracion/escribir-env.js';
@@ -18,16 +20,50 @@ import { RegistroPerfiles } from '../registro/registro-perfiles.js';
  * exactamente el mismo backend que ya usan las habilidades conversacionales
  * (RegistroHerramientas, RegistroPerfiles, fabrica-providers) -- esto es
  * otra "puerta de entrada" al mismo núcleo, no un sistema aparte.
+ *
+ * Bind a 127.0.0.1 NO alcanza como protección: cualquier pestaña abierta
+ * en el mismo navegador puede alcanzar localhost. Por eso las rutas que
+ * cambian estado exigen un token de sesión (generado al arrancar, embebido
+ * en la página, nunca expuesto por una URL que un tercero pueda adivinar)
+ * en un header -- un header custom fuerza preflight CORS, que una petición
+ * cross-origin en modo "no-cors" no puede disparar.
  */
 
 const PUERTO = Number(process.env.PUERTO_INTERFAZ ?? 4321);
 const DIR_PUBLICO = path.join(path.dirname(fileURLToPath(import.meta.url)), 'publico');
+const TOKEN_SESION = randomBytes(32).toString('hex');
+const HEADER_TOKEN = 'x-interfaz-token';
+const ORIGENES_PERMITIDOS = new Set([`http://localhost:${PUERTO}`, `http://127.0.0.1:${PUERTO}`]);
 
 const TIPOS_MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
 };
+
+const ConectarRequestSchema = z.object({
+  perfilId: z.string().regex(/^[a-z][a-z0-9-]*$/, 'perfilId debe ser kebab-case'),
+  profesionNueva: z.string().optional(),
+  herramientaId: z.string(),
+  campos: z.record(
+    z.string(),
+    z.string().refine((v) => !/[\r\n]/.test(v), 'un valor de credencial no puede contener saltos de línea'),
+  ),
+  capacidadesHabilitadas: z.array(z.string()).optional(),
+});
+
+function tokenValido(recibido: string | undefined): boolean {
+  if (!recibido || recibido.length !== TOKEN_SESION.length) return false;
+  // comparación en tiempo constante -- no dar pistas de cuántos caracteres coinciden
+  return timingSafeEqual(Buffer.from(recibido), Buffer.from(TOKEN_SESION));
+}
+
+function origenValido(req: http.IncomingMessage): boolean {
+  const origen = req.headers.origin;
+  // sin header Origin (ej. curl, o una petición same-origin en navegadores viejos) -> se deja
+  // pasar aquí, el token sigue siendo la barrera real; con header Origin presente, debe matchear.
+  return !origen || ORIGENES_PERMITIDOS.has(origen);
+}
 
 async function servirArchivoEstatico(res: http.ServerResponse, rutaRelativa: string): Promise<void> {
   const ruta = path.join(DIR_PUBLICO, rutaRelativa);
@@ -42,12 +78,25 @@ async function servirArchivoEstatico(res: http.ServerResponse, rutaRelativa: str
   }
 }
 
+/** index.html se sirve siempre generado en el momento, con el token de esta ejecución embebido. */
+async function servirIndexConToken(res: http.ServerResponse): Promise<void> {
+  try {
+    const html = await readFile(path.join(DIR_PUBLICO, 'index.html'), 'utf-8');
+    const conToken = html.replace('%%TOKEN_INTERFAZ%%', TOKEN_SESION);
+    res.writeHead(200, { 'Content-Type': TIPOS_MIME['.html'] });
+    res.end(conToken);
+  } catch {
+    res.writeHead(404);
+    res.end('No encontrado');
+  }
+}
+
 function enviarJSON(res: http.ServerResponse, estado: number, cuerpo: unknown): void {
   res.writeHead(estado, { 'Content-Type': 'application/json; charset=utf-8' });
   res.end(JSON.stringify(cuerpo));
 }
 
-async function leerCuerpoJSON(req: http.IncomingMessage): Promise<Record<string, unknown>> {
+async function leerCuerpoJSON(req: http.IncomingMessage): Promise<unknown> {
   const partes: Buffer[] = [];
   for await (const parte of req) partes.push(parte as Buffer);
   const texto = Buffer.concat(partes).toString('utf-8');
@@ -55,18 +104,16 @@ async function leerCuerpoJSON(req: http.IncomingMessage): Promise<Record<string,
 }
 
 async function manejarConectar(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
-  const cuerpo = await leerCuerpoJSON(req);
-  const perfilId = String(cuerpo.perfilId ?? '').trim();
-  const profesionNueva = cuerpo.profesionNueva ? String(cuerpo.profesionNueva) : undefined;
-  const herramientaId = String(cuerpo.herramientaId ?? '');
-  const campos = (cuerpo.campos ?? {}) as Record<string, string>;
-  const capacidadesHabilitadas = Array.isArray(cuerpo.capacidadesHabilitadas)
-    ? (cuerpo.capacidadesHabilitadas as string[])
-    : undefined;
-
-  if (!perfilId || !herramientaId) {
-    return enviarJSON(res, 400, { error: 'perfilId y herramientaId son requeridos' });
+  let cuerpo: z.infer<typeof ConectarRequestSchema>;
+  try {
+    cuerpo = ConectarRequestSchema.parse(await leerCuerpoJSON(req));
+  } catch (error) {
+    return enviarJSON(res, 400, {
+      error: 'cuerpo inválido',
+      detalle: error instanceof z.ZodError ? error.issues : String(error),
+    });
   }
+  const { perfilId, profesionNueva, herramientaId, campos, capacidadesHabilitadas } = cuerpo;
 
   const registroHerramientas = await RegistroHerramientas.cargar();
   const herramienta = registroHerramientas.obtener(herramientaId);
@@ -77,6 +124,14 @@ async function manejarConectar(req: http.IncomingMessage, res: http.ServerRespon
     return enviarJSON(res, 409, {
       error: `"${herramientaId}" todavía no está evaluada como disponible (estado: ${herramienta.estado})`,
     });
+  }
+
+  // Mínimo privilegio real, no solo de interfaz: nunca se habilita una
+  // Capacidad que esta Herramienta no ofrezca, aunque el cliente la pida.
+  const solicitadas = capacidadesHabilitadas?.length ? capacidadesHabilitadas : herramienta.capacidadesQueOfrece;
+  const capacidadesFinal = solicitadas.filter((c) => herramienta.capacidadesQueOfrece.includes(c));
+  if (capacidadesFinal.length === 0) {
+    return enviarJSON(res, 400, { error: 'ninguna capacidad solicitada es ofrecida por esta herramienta' });
   }
 
   const registroPerfiles = new RegistroPerfiles();
@@ -101,7 +156,7 @@ async function manejarConectar(req: http.IncomingMessage, res: http.ServerRespon
   const conectadoEn = new Date().toISOString();
   await registroPerfiles.guardarIntegracionActiva(perfilId, {
     herramienta: herramientaId,
-    capacidadesHabilitadas: capacidadesHabilitadas?.length ? capacidadesHabilitadas : herramienta.capacidadesQueOfrece,
+    capacidadesHabilitadas: capacidadesFinal,
     credencialesRef: Object.keys(paresEnv)[0] ?? herramientaId,
     conectadoEn,
     estado: 'activa',
@@ -128,13 +183,15 @@ async function manejarConectar(req: http.IncomingMessage, res: http.ServerRespon
   enviarJSON(res, 200, { ok: true, perfilId, herramienta: herramientaId, verificacion });
 }
 
-const servidor = http.createServer(async (req, res) => {
+/** Construye el servidor sin escuchar todavía -- así los tests pueden levantarlo en un puerto efímero. */
+export function crearServidor(): http.Server {
+  return http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url ?? '/', `http://localhost:${PUERTO}`);
 
-    if (req.method === 'GET' && url.pathname === '/') return servirArchivoEstatico(res, 'index.html');
+    if (req.method === 'GET' && url.pathname === '/') return await servirIndexConToken(res);
     if (req.method === 'GET' && (url.pathname === '/app.js' || url.pathname === '/estilos.css')) {
-      return servirArchivoEstatico(res, url.pathname.slice(1));
+      return await servirArchivoEstatico(res, url.pathname.slice(1));
     }
 
     if (req.method === 'GET' && url.pathname === '/api/herramientas') {
@@ -154,6 +211,13 @@ const servidor = http.createServer(async (req, res) => {
     }
 
     if (req.method === 'POST' && url.pathname === '/api/conectar') {
+      // Barrera CSRF: token de sesión (no adivinable) + Origin, ambas antes
+      // de tocar cualquier archivo. Un header custom no se puede mandar en
+      // modo "no-cors", así que esto cierra el vector de "cualquier pestaña
+      // abierta puede conectar una Herramienta con credenciales ajenas".
+      if (!origenValido(req) || !tokenValido(req.headers[HEADER_TOKEN] as string | undefined)) {
+        return enviarJSON(res, 403, { error: 'token de sesión inválido o ausente' });
+      }
       return await manejarConectar(req, res);
     }
 
@@ -162,8 +226,15 @@ const servidor = http.createServer(async (req, res) => {
   } catch (error) {
     enviarJSON(res, 500, { error: error instanceof Error ? error.message : String(error) });
   }
-});
+  });
+}
 
-servidor.listen(PUERTO, '127.0.0.1', () => {
-  console.log(`Interfaz local corriendo en http://localhost:${PUERTO} (Ctrl+C para detenerla)`);
-});
+export { TOKEN_SESION };
+
+/* c8 ignore start -- arranque real; en tests, vitest define process.env.VITEST y este bloque no corre */
+if (!process.env.VITEST) {
+  crearServidor().listen(PUERTO, '127.0.0.1', () => {
+    console.log(`Interfaz local corriendo en http://localhost:${PUERTO} (Ctrl+C para detenerla)`);
+  });
+}
+/* c8 ignore stop */

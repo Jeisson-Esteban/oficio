@@ -5,6 +5,7 @@ import { IntegracionActivaSchema, type IntegracionActiva } from '../contratos/in
 import { PerfilSchema, type Perfil } from '../contratos/perfil.js';
 import { ProcesoSchema, type Proceso } from '../contratos/proceso.js';
 import { ErrorValidacion } from '../errores/index.js';
+import { assertIdSeguro } from './validar-id.js';
 
 /**
  * ÚNICO punto del sistema que lee o escribe perfiles/<id>/*.yaml.
@@ -18,14 +19,17 @@ export class RegistroPerfiles {
   constructor(private readonly raiz = 'perfiles') {}
 
   private rutaPerfil(perfilId: string): string {
+    assertIdSeguro(perfilId, 'perfilId');
     return path.join(this.raiz, perfilId, 'perfil.yaml');
   }
 
   private rutaIntegraciones(perfilId: string): string {
+    assertIdSeguro(perfilId, 'perfilId');
     return path.join(this.raiz, perfilId, 'integraciones-activas.yaml');
   }
 
   private rutaCarpetaProcesos(perfilId: string): string {
+    assertIdSeguro(perfilId, 'perfilId');
     return path.join(this.raiz, perfilId, 'procesos');
   }
 

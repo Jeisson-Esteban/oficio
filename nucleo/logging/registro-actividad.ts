@@ -1,5 +1,6 @@
 import { appendFile, mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { assertIdSeguro } from '../registro/validar-id.js';
 
 /**
  * Registro de actividad por Perfil (JSONL, append-only) -- la señal real
@@ -19,6 +20,7 @@ export interface EventoActividad {
 }
 
 function ruta(perfilId: string, raiz: string): string {
+  assertIdSeguro(perfilId, 'perfilId');
   return path.join(raiz, perfilId, 'actividad.jsonl');
 }
 

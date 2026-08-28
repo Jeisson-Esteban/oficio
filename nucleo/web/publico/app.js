@@ -126,7 +126,7 @@ modalForm.addEventListener('submit', async (evento) => {
   const profesionNueva = selectPerfil.selectedOptions[0]?.dataset.profesionNueva;
   const respuesta = await fetch('/api/conectar', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-Interfaz-Token': window.__TOKEN_INTERFAZ__ },
     body: JSON.stringify({ perfilId, profesionNueva, herramientaId, campos, capacidadesHabilitadas }),
   }).then((r) => r.json());
 

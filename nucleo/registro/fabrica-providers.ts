@@ -9,8 +9,34 @@ import { MetricoolProvider } from '../../integraciones/social-media/metricool.pr
 import { ZernioProvider } from '../../integraciones/social-media/zernio.provider.js';
 import type { AlmacenCredenciales } from '../contratos/credenciales.js';
 import { AdaptadorMCPGenerico } from '../mcp/adaptador-mcp-generico.js';
-import { ErrorCapacidadNoResuelta } from '../errores/index.js';
+import { ErrorCapacidadNoResuelta, ErrorValidacion } from '../errores/index.js';
 import type { RegistroMCP } from './registro-mcp.js';
+
+/**
+ * A diferencia de mailerlite/klaviyo/zernio (URL fija en mcp-registry.config.yaml),
+ * la de GoHighLevel es por subcuenta y viene como credencial -- eso significa
+ * que un dato controlado por quien conecta la Herramienta termina siendo la
+ * URL a la que este proceso le manda el token Bearer. Validar forma y host
+ * evita que apunte a un servidor arbitrario si esa credencial llega
+ * corrompida o manipulada (ver hallazgo de CSRF en nucleo/web/servidor.ts).
+ */
+function validarUrlGoHighLevel(url: string): string {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new ErrorValidacion(`mcpUrl de GoHighLevel no es una URL válida: "${url}"`);
+  }
+  if (parsed.protocol !== 'https:') {
+    throw new ErrorValidacion('mcpUrl de GoHighLevel debe ser https');
+  }
+  if (!parsed.hostname.endsWith('.leadconnectorhq.com')) {
+    throw new ErrorValidacion(
+      `mcpUrl de GoHighLevel debe apuntar a *.leadconnectorhq.com, recibido: "${parsed.hostname}"`,
+    );
+  }
+  return url;
+}
 
 export interface EstadoSaludProvider {
   ok: boolean;
@@ -91,7 +117,7 @@ export async function construirProvider(
     const c = await almacenCredenciales.obtenerCredencial({ proveedor: 'gohighlevel' });
     const mcp = new AdaptadorMCPGenerico({
       id: 'gohighlevel',
-      url: c.mcpUrl!,
+      url: validarUrlGoHighLevel(c.mcpUrl!),
       encabezados: { Authorization: `Bearer ${c.token}` },
     });
     const provider = new GoHighLevelProvider(mcp);

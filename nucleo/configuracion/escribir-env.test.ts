@@ -49,4 +49,19 @@ describe('establecerVariablesEnv', () => {
     await establecerVariablesEnv({ CLAVE_NUEVA: 'valor1' }, ruta);
     expect(process.env.CLAVE_NUEVA).toBe('valor1');
   });
+
+  it('rechaza un valor con salto de línea en vez de inyectar una línea nueva en .env', async () => {
+    await writeFile(ruta, 'OTRA=algo-importante\n', 'utf-8');
+
+    await expect(
+      establecerVariablesEnv({ CLAVE_NUEVA: 'x\nOTRA=secuestrada' }, ruta),
+    ).rejects.toThrow();
+
+    // el archivo no debe haberse tocado si la validación rechazó el valor
+    expect(await readFile(ruta, 'utf-8')).toBe('OTRA=algo-importante\n');
+  });
+
+  it('rechaza una clave con salto de línea', async () => {
+    await expect(establecerVariablesEnv({ 'CLAVE\nMALA': 'valor' }, ruta)).rejects.toThrow();
+  });
 });

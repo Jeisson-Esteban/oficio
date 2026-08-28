@@ -3,6 +3,7 @@ import path from 'node:path';
 import { parse, stringify } from 'yaml';
 import { z } from 'zod';
 import { ErrorValidacion } from '../errores/index.js';
+import { assertIdSeguro } from '../registro/validar-id.js';
 
 /**
  * Memoria guarda ESTRUCTURA Y REFERENCIAS, nunca una copia de datos
@@ -38,6 +39,7 @@ export class AlmacenMemoriaArchivo implements AlmacenMemoria {
   constructor(private readonly raiz = 'perfiles') {}
 
   private ruta(perfilId: string): string {
+    assertIdSeguro(perfilId, 'perfilId');
     return path.join(this.raiz, perfilId, 'memoria.yaml');
   }
 

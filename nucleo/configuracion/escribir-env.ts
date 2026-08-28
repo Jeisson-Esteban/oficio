@@ -1,4 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
+import { ErrorValidacion } from '../errores/index.js';
 
 /**
  * Escribe pares clave=valor en ".env": actualiza la línea si la clave ya
@@ -10,6 +11,16 @@ import { readFile, writeFile } from 'node:fs/promises';
  * profesional mientras configura algo) -- nunca se expone a la red.
  */
 export async function establecerVariablesEnv(pares: Record<string, string>, ruta = '.env'): Promise<void> {
+  // Un valor con salto de línea podría inyectar una línea .env adicional
+  // (ej. pisar una credencial de OTRO proveedor que no es la que se está
+  // conectando). Nunca debería llegar hasta acá -- rechazarlo aquí es la
+  // última barrera, no la única.
+  for (const [clave, valor] of Object.entries(pares)) {
+    if (/[\r\n]/.test(clave) || /[\r\n]/.test(valor)) {
+      throw new ErrorValidacion(`la credencial "${clave}" contiene un salto de línea -- no se escribe a .env`);
+    }
+  }
+
   let contenido = '';
   try {
     contenido = await readFile(ruta, 'utf-8');
