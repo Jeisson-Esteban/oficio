@@ -5,6 +5,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "postinstall": "node scripts/instalar-skills.mjs",
+    "skills:instalar": "node scripts/instalar-skills.mjs",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

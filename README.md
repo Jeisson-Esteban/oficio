@@ -26,9 +26,11 @@ Por debajo, todo lo técnico (Skills, MCPs, credenciales, Providers) es infraest
 ## Instalación
 
 ```bash
-npm install
+npm install   # tambien enlaza las skills en .claude/skills/ (ver scripts/instalar-skills.mjs)
 cp .env.example .env   # completar con credenciales reales cuando se vaya a probar en serio
 ```
+
+**Importante:** para que Claude Code detecte las skills conversacionales hay que abrirlo en esta carpeta (terminal, extensión de VS Code, o app de escritorio) -- **no** funciona pegando el link del repo en un chat normal de claude.ai, que no tiene acceso a terminal ni puede correr `npm run interfaz`.
 
 ## Probarlo
 
