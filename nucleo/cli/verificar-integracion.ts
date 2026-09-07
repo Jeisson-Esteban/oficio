@@ -1,4 +1,4 @@
-import { AlmacenCredencialesEntorno } from '../configuracion/variables-entorno.js';
+import { AlmacenCredencialesLocal } from '../configuracion/almacen-credenciales.js';
 import { construirProvider } from '../registro/fabrica-providers.js';
 import { RegistroHerramientas } from '../registro/registro-herramientas.js';
 import { RegistroMCP } from '../registro/registro-mcp.js';
@@ -34,7 +34,7 @@ if (!herramientaCatalogada) {
   throw new Error(`"${herramientaId}" ya no existe en el catálogo de herramientas`);
 }
 
-const almacenCredenciales = new AlmacenCredencialesEntorno({
+const almacenCredenciales = new AlmacenCredencialesLocal({
   [herramientaId]: herramientaCatalogada.camposCredenciales,
 });
 const registroMCP = await RegistroMCP.cargar();

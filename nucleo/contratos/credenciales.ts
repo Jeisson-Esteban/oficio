@@ -1,7 +1,9 @@
 /**
  * Identifica de quién y de qué Herramienta son unas credenciales, sin decir
- * dónde están guardadas. La implementación (env vars hoy, un secrets manager
- * mañana) es intercambiable porque todo el código depende solo de esto.
+ * dónde están guardadas. La implementación (hoy: variables de entorno, o un
+ * archivo local cifrado -- ver nucleo/configuracion/almacen-credenciales.ts;
+ * mañana: un secrets manager en la nube) es intercambiable porque todo el
+ * código depende solo de esto.
  */
 export interface AlcanceCredencial {
   /** id de la Herramienta (ej. "notion", "google-calendar") */

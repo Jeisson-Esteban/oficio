@@ -1,4 +1,4 @@
-import { AlmacenCredencialesEntorno } from '../configuracion/variables-entorno.js';
+import { AlmacenCredencialesLocal } from '../configuracion/almacen-credenciales.js';
 import { RegistroHerramientas } from '../registro/registro-herramientas.js';
 import { RegistroMCP } from '../registro/registro-mcp.js';
 import { imprimir } from './util.js';
@@ -23,7 +23,7 @@ const registroHerramientas = await RegistroHerramientas.cargar();
 const camposCredenciales = registroHerramientas.obtener(mcpId)?.camposCredenciales ?? ['token'];
 
 const registro = await RegistroMCP.cargar();
-const credenciales = new AlmacenCredencialesEntorno({ [mcpId]: camposCredenciales });
+const credenciales = new AlmacenCredencialesLocal({ [mcpId]: camposCredenciales });
 const adaptador = await registro.obtenerAdaptador(mcpId, credenciales, { proveedor: mcpId });
 
 const salud = await adaptador.verificarSalud();

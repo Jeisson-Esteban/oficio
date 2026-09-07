@@ -6,9 +6,8 @@ import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { PerfilSchema } from '../contratos/perfil.js';
 import { claveEntorno } from '../configuracion/variables-entorno.js';
-import { establecerVariablesEnv } from '../configuracion/escribir-env.js';
+import { AlmacenCredencialesLocal, guardarCredencialesLocal } from '../configuracion/almacen-credenciales.js';
 import { construirProvider } from '../registro/fabrica-providers.js';
-import { AlmacenCredencialesEntorno } from '../configuracion/variables-entorno.js';
 import { RegistroHerramientas } from '../registro/registro-herramientas.js';
 import { RegistroMCP } from '../registro/registro-mcp.js';
 import { RegistroPerfiles } from '../registro/registro-perfiles.js';
@@ -157,7 +156,7 @@ async function manejarConectar(req: http.IncomingMessage, res: http.ServerRespon
   for (const campo of herramienta.camposCredenciales) {
     if (campos[campo]) paresEnv[claveEntorno({ proveedor: herramientaId }, campo)] = campos[campo];
   }
-  await establecerVariablesEnv(paresEnv);
+  await guardarCredencialesLocal(paresEnv);
 
   const conectadoEn = new Date().toISOString();
   await registroPerfiles.guardarIntegracionActiva(perfilId, {
@@ -169,7 +168,7 @@ async function manejarConectar(req: http.IncomingMessage, res: http.ServerRespon
   });
 
   // Verificación real, igual que nucleo/cli/verificar-integracion.ts.
-  const almacenCredenciales = new AlmacenCredencialesEntorno({ [herramientaId]: herramienta.camposCredenciales });
+  const almacenCredenciales = new AlmacenCredencialesLocal({ [herramientaId]: herramienta.camposCredenciales });
   const registroMCP = await RegistroMCP.cargar();
   let verificacion: { ok: boolean; error?: string };
   try {

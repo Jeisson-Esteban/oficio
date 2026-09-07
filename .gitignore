@@ -7,6 +7,11 @@ dist/
 .env.local
 .env.*.local
 
+# almacen local cifrado de credenciales (ver nucleo/configuracion/almacen-credenciales.ts)
+# y la clave maestra que lo cifra -- generados en la maquina del profesional, nunca aqui
+.credenciales.local.json
+.clave-local.key
+
 # config local de agentes de IA (personal/de esta maquina, no del producto)
 .claude/settings.local.json
 .mcp.json

@@ -55,11 +55,33 @@ y revisar el historial de sesiones anteriores.
 
 Nunca conectes sin un sí explícito.
 
-## Paso 4: credenciales
+## Paso 4: credenciales -- el profesional nunca toca terminal ni texto plano
 
-No le pidas al profesional que te pegue tokens o secretos en el chat si se puede evitar. Preséntale la `guiaCredenciales` de esa Herramienta en el catálogo (`herramientas/<id>.yaml`), **palabra por palabra y en orden** -- son instrucciones ya escritas para que cualquiera las siga sin saber de tecnología, no las improvises. Al final dile con qué nombre exacto queda la variable de entorno de cada `camposCredenciales` (formato `<HERRAMIENTA>__DEFAULT__<CAMPO>`, ver `nucleo/configuracion/variables-entorno.ts`). Confirmar que la variable está puesta es responsabilidad del profesional o de quien despliegue esto -- tu trabajo es dejarle instrucciones claras, no manipular secretos directamente.
+Primero, preséntale la `guiaCredenciales` de esa Herramienta en el catálogo (`herramientas/<id>.yaml`), **palabra por palabra y en orden** -- son instrucciones ya escritas para que cualquiera las siga sin saber de tecnología, no las improvises. Esa guía le dice dónde conseguir cada valor (token, id, etc.) en el sitio de la Herramienta.
+
+Una vez que el profesional tiene esos valores a mano, hay dos formas de guardarlos -- en ambas, el archivo en disco queda **cifrado** (`nucleo/configuracion/almacen-credenciales.ts`, AES-256-GCM), nunca en un `.env` plano:
+
+**Opción preferida -- interfaz web local.** Levantala vos mismo en segundo plano:
+
+```
+npx tsx nucleo/web/servidor.ts
+```
+
+y pasale al profesional el link (`http://localhost:4321` salvo que `PUERTO_INTERFAZ` diga otro puerto) para que pegue ahí sus datos, en su propio navegador -- decile con qué Herramienta y perfil vas a dejarla preseleccionada. Esto es mejor que pedírselo en el chat porque el valor ni siquiera pasa por esta conversación, y el formulario ya guarda la Integración y la verifica solo (ver Pasos 5 y 6 más abajo). Cuando te confirme que lo envió, segui al Paso 6 para chequear el resultado -- no hace falta correr el Paso 5 a mano en este camino.
+
+**Si de verdad no podés levantar esa interfaz** (sin red local, sin navegador disponible): recibí el valor en el chat como último recurso, pero nunca lo escribas a mano en `.env` ni en ningún archivo sin cifrar. Guardalo así:
+
+```
+npx tsx nucleo/cli/guardar-credenciales.ts <herramientaId> '{"token": "...", "databaseId": "..."}'
+```
+
+(también acepta `@ruta-al-json` en vez del JSON inline). Esto deja las mismas claves cifradas que dejaría la interfaz web -- seguí con el Paso 5.
+
+Nunca le pidas al profesional que abra una terminal, edite un archivo, o corra un comando -- eso lo hacés siempre vos.
 
 ## Paso 5: registrar la conexión
+
+Solo si usaste el camino de respaldo del Paso 4 (chat + `guardar-credenciales.ts`) -- si usaste la interfaz web, este paso ya ocurrió solo al enviar el formulario.
 
 Solo capacidades explícitamente autorizadas (mínimo privilegio) -- no actives todas las que ofrece la herramienta si el profesional solo pidió una:
 
@@ -71,12 +93,16 @@ donde el JSON sigue `nucleo/contratos/integracion.ts` (`herramienta`, `capacidad
 
 ## Paso 6: verificar de verdad (no dar por hecho que funciona)
 
-Guardar el archivo no prueba que las credenciales sirvan. Corre siempre:
+Guardar el archivo no prueba que las credenciales sirvan.
 
-```
-npx tsx nucleo/cli/verificar-integracion.ts <perfilId> <herramientaId>
-```
+- Si usaste la interfaz web (Paso 4), la verificación ya corrió sola al conectar -- confirmá el resultado con `curl http://localhost:4321/api/perfiles/<perfilId>/integraciones` (o el equivalente que tengas a mano) y mirá el campo `verificacion` de la Integración recién creada.
+- Si usaste el camino de respaldo (chat + CLI), corré vos mismo:
 
+  ```
+  npx tsx nucleo/cli/verificar-integracion.ts <perfilId> <herramientaId>
+  ```
+
+En ambos casos:
 - Si `verificacion.ok` es `true` → dile al profesional que quedó conectada y probada, no solo guardada.
 - Si es `false` → muéstrale el error en lenguaje simple y ayúdalo a revisar ese paso de la guía de credenciales, sin asumir que el resto de la conexión está mal.
 
@@ -86,4 +112,6 @@ npx tsx nucleo/cli/verificar-integracion.ts <perfilId> <herramientaId>
 - No conectes una Herramienta sin autorización explícita del profesional.
 - No habilites más Capacidades de las que el profesional pidió.
 - No le muestres al profesional el YAML ni le pidas que edite archivos.
+- No le pidas al profesional que abra una terminal o corra un comando -- eso lo hacés siempre vos (ver `CLAUDE.md` / `AGENTS.md`).
+- No escribas una credencial en texto plano (`.env` u otro archivo sin cifrar) -- usá siempre la interfaz web o `guardar-credenciales.ts` (Paso 4).
 - No des una conexión por buena sin haber corrido el Paso 6.
